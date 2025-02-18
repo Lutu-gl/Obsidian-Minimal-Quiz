@@ -20,6 +20,9 @@ George Orwell
 
 The plugin will automatically detect the questions and present them in quiz format.
 
+## Shoutout
+This project was inspired by [Obsidian Simple Note Quiz](https://github.com/beginner137/Obsidian-simple-note-quiz). While that plugin offers great functionality, Obsidian-MinimalQuiz aims to provide an even more minimalistic design with improved stability and no bugs.
+
 ## Installation
 1. Download and extract the latest release into your Obsidian plugins folder.
 2. Enable **Obsidian-MinimalQuiz** in the Obsidian settings.
