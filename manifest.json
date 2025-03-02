@@ -6,6 +6,6 @@
 	"description": "A minimalistic quiz plugin for Obsidian. Questions are defined in Markdown files with simple formatting.",
 	"author": "Lutu-gl",
 	"authorUrl": "https://github.com/Lutu-gl",
-	"isDesktopOnly": false
+	"isDesktopOnly": true
   }
   
