@@ -1,4 +1,4 @@
-# Obsidian-MinimalQuiz
+# Obsidian-Minimal-Quiz
 
 Obsidian-MinimalQuiz is the simplest quiz plugin for Obsidian. Define questions directly in your Markdown files—no extra setup required. Just write, quiz, and learn!
 
