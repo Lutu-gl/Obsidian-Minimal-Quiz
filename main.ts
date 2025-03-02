@@ -1,5 +1,4 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-// Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
 	mySetting: string;
@@ -27,6 +26,7 @@ export default class MinimalQuizPlugin extends Plugin {
 				const qaMap = this.extractQuestionsAndAnswers(content);
 				const entries = Array.from(qaMap.entries());
 				if (entries.length > 0) {
+					new Notice(entries.toString());
 					new QuestionsModal(this.app, entries).open();
 				} else {
 					new Notice('No questions found.');
@@ -75,15 +75,8 @@ class QuestionsModal extends Modal {
 	}
 
 	onOpen() {
-		//const {contentEl, modalEl} = this;
 		this.render();
-		this.modalEl.style.backdropFilter = 'blur(10px)';
-		this.modalEl.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-		this.modalEl.style.color = 'white';
-		this.modalEl.style.padding = '20px';
-		this.modalEl.style.borderRadius = '8px';
-		
-		window.addEventListener('keydown', this.handleKeyDown)
+		window.addEventListener('keydown', this.handleKeyDown);
 	}
 
 	handleKeyDown = (event: KeyboardEvent) => {
@@ -97,27 +90,42 @@ class QuestionsModal extends Modal {
 		const { contentEl } = this;
 		contentEl.empty();
 
-		const [question, answer] = this.entries[this.currentIndex];
-		contentEl.createEl('h2', question);
-		
-		const answerEl = contentEl.createEl('p', { text: this.answerVisible ? answer : ''});
-		answerEl.style.marginTop = '20px';
+		if (this.currentIndex >= this.entries.length) {
+			new Notice('You finished the Quiz - Good Job!');
+			this.close();
+			return;
+		}
 
-		const button = contentEl.createEl('button', { text: this.answerVisible ? 'Next Questions' : 'Show Answer'});
+		const [question, answer] = this.entries[this.currentIndex];
+
+		const questionEl = contentEl.createEl('h2');
+		questionEl.textContent = question;
+
+		const answerEl = contentEl.createEl('p', {
+			text: this.answerVisible ? answer : '',
+		});
+		answerEl.style.marginTop = '5px';
+
+		const button = contentEl.createEl('button', {
+			text: this.answerVisible ? 'Next Question' : 'Show Answer',
+		});
+		
 		button.style.marginTop = '20px';
 		button.addEventListener('click', () => this.toggleAnswer());
 	}
 
-	toggleAnswer(){
-		if (this.answerVisible){
+	toggleAnswer() {
+		if (this.answerVisible) {
 			this.currentIndex++;
 			this.answerVisible = false;
-			this.render();
+		} else {
+			this.answerVisible = true;
 		}
+		this.render();
 	}
 
 	onClose() {
-		const {contentEl} = this;
+		const { contentEl } = this;
 		contentEl.empty();
 		window.removeEventListener('keydown', this.handleKeyDown);
 	}
