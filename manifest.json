@@ -1,6 +1,6 @@
 {
-	"id": "obsidian-minimalquiz",
-	"name": "Obsidian MinimalQuiz",
+	"id": "minimal-quiz",
+	"name": "Minimal Quiz",
 	"version": "1.0.0",
 	"minAppVersion": "1.0.0",
 	"description": "A minimalistic quiz plugin for Obsidian. Questions are defined in Markdown files with simple formatting.",

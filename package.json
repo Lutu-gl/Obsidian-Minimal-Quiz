@@ -1,5 +1,5 @@
 {
-	"name": "obsidian-minimalquiz",
+	"name": "minimal-quiz",
 	"version": "1.0.0",
 	"description": "A minimalistic quiz plugin for Obsidian. Questions are defined in Markdown files with simple formatting.",
 	"main": "main.js",
@@ -12,7 +12,8 @@
 		"obsidian",
 		"quiz",
 		"markdown",
-		"plugin"
+		"plugin",
+		"anki"
 	],
 	"author": "Lutu-gl",
 	"authorUrl": "https://github.com/Lutu-gl",
