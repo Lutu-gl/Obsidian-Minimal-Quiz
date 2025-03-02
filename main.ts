@@ -1,11 +1,11 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
 interface MyPluginSettings {
-	mySetting: string;
+	alignment: 'left' | 'center';
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
+	alignment: 'center'
 }
 
 export default class MinimalQuizPlugin extends Plugin {
@@ -13,8 +13,8 @@ export default class MinimalQuizPlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
-			this.addRibbonIcon('dice', 'Greet', () => {
-			new Notice('Hello, world!2');
+			this.addRibbonIcon('dice', 'Start Quiz', () => {
+			new Notice('Quiz started!');
 		});
 
 		this.addCommand({
@@ -26,8 +26,7 @@ export default class MinimalQuizPlugin extends Plugin {
 				const qaMap = this.extractQuestionsAndAnswers(content);
 				const entries = Array.from(qaMap.entries());
 				if (entries.length > 0) {
-					new Notice(entries.toString());
-					new QuestionsModal(this.app, entries).open();
+					new QuestionsModal(this.app, entries, this.settings).open();
 				} else {
 					new Notice('No questions found.');
 				}
@@ -68,10 +67,12 @@ class QuestionsModal extends Modal {
 	entries: [string, string][];
 	answerVisible = false;
 	currentIndex = 0;
+	settings: MyPluginSettings;
 
-	constructor(app: App, questions: [string, string][]) {
+	constructor(app: App, questions: [string, string][], settings: MyPluginSettings) {
 		super(app);
 		this.entries = questions;
+		this.settings = settings;
 	}
 
 	onOpen() {
@@ -84,35 +85,54 @@ class QuestionsModal extends Modal {
 			this.toggleAnswer();
 			event.preventDefault();
 		}
-	};
-
-	render() {
-		const { contentEl } = this;
-		contentEl.empty();
-
-		if (this.currentIndex >= this.entries.length) {
-			new Notice('You finished the Quiz - Good Job!');
-			this.close();
-			return;
-		}
-
-		const [question, answer] = this.entries[this.currentIndex];
-
-		const questionEl = contentEl.createEl('h2');
-		questionEl.textContent = question;
-
-		const answerEl = contentEl.createEl('p', {
-			text: this.answerVisible ? answer : '',
-		});
-		answerEl.style.marginTop = '5px';
-
-		const button = contentEl.createEl('button', {
-			text: this.answerVisible ? 'Next Question' : 'Show Answer',
-		});
-		
-		button.style.marginTop = '20px';
-		button.addEventListener('click', () => this.toggleAnswer());
 	}
+
+
+    render() {
+        const { contentEl } = this;
+        contentEl.empty();
+
+        if (this.currentIndex >= this.entries.length) {
+            new Notice('You finished the Quiz - Good Job!');
+            this.close();
+            return;
+        }
+
+        const progressText = `${this.currentIndex + 1}/${this.entries.length}`;
+        const progressEl = contentEl.createEl('div', {
+            text: `Progress: ${progressText}`,
+        });
+        progressEl.style.marginBottom = '20px';
+
+        const [question, answer] = this.entries[this.currentIndex];
+
+        const questionEl = contentEl.createEl('h1');
+        questionEl.textContent = question;
+
+        const answerEl = contentEl.createEl('p', {
+            text: this.answerVisible ? answer : '',
+        });
+        answerEl.style.marginTop = '5px';
+		
+		let button;
+		if (this.currentIndex >= this.entries.length - 1){
+			button = contentEl.createEl('button', {
+	            text: this.answerVisible ? 'Finish Quiz' : 'Show Answer',
+			})
+		} else {
+			button = contentEl.createEl('button', {
+	            text: this.answerVisible ? 'Next Question' : 'Show Answer',
+	        });
+		}
+        button.style.marginTop = '20px';
+        button.addEventListener('click', () => this.toggleAnswer());
+
+        if (this.settings.alignment === 'center') {
+            contentEl.style.textAlign = 'center';
+        } else {
+            contentEl.style.textAlign = 'left';
+        }
+    }
 
 	toggleAnswer() {
 		if (this.answerVisible) {
