@@ -16,35 +16,35 @@ export default class MinimalQuizPlugin extends Plugin {
 
         this.addSettingTab(new MinimalQuizSettingTab(this.app, this));
 
-		this.addRibbonIcon('checkbox-glyph', 'Start Quiz', () => {
-			const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
-			if (activeView) {
-				const editor = activeView.editor;
-				this.startQuiz(editor);
-			} else {
-				new Notice('No active Markdown editor found.');
-			}
-		});
+        this.addRibbonIcon('checkbox-glyph', 'Start Quiz', () => {
+            const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+            if (activeView) {
+                const editor = activeView.editor;
+                this.startQuiz(editor);
+            } else {
+                new Notice('No active Markdown editor found.');
+            }
+        });
 
         this.addCommand({
             id: 'show-questions-modal',
             name: 'Start quiz on current file',
             editorCallback: (editor: Editor, view: MarkdownView) => {
-				this.startQuiz(editor);
+                this.startQuiz(editor);
             },
         });
     }
 
-	startQuiz(editor: Editor) {
-		const content = editor.getValue();
-		const qaMap = this.extractQuestionsAndAnswers(content);
-		const entries = Array.from(qaMap.entries());
-		if (entries.length > 0) {
-			new QuestionsModal(this.app, entries, this.settings).open();
-		} else {
-			new Notice('No questions found.');
-		}
-	}
+    startQuiz(editor: Editor) {
+        const content = editor.getValue();
+        const qaMap = this.extractQuestionsAndAnswers(content);
+        const entries = Array.from(qaMap.entries());
+        if (entries.length > 0) {
+            new QuestionsModal(this.app, entries, this.settings).open();
+        } else {
+            new Notice('No questions found.');
+        }
+    }
 
     extractQuestionsAndAnswers(content: string): Map<string, string> {
         const qaMap = new Map<string, string>();
@@ -108,10 +108,10 @@ class QuestionsModal extends Modal {
         const questionEl = contentEl.createEl('h1');
         questionEl.textContent = question;
 
-        const answerEl = contentEl.createEl('p', {
-            text: this.answerVisible ? answer : '',
-        });
-        answerEl.style.marginTop = '5px';
+        const answerContainer = contentEl.createEl('div');
+        if (this.answerVisible) {
+            this.renderAnswer(answer, answerContainer);
+        }
 
         // Button-Text basierend auf der aktuellen Frage
         const isLastQuestion = this.currentIndex === this.entries.length - 1;
@@ -129,6 +129,26 @@ class QuestionsModal extends Modal {
             contentEl.style.textAlign = 'center';
         } else {
             contentEl.style.textAlign = 'left';
+        }
+    }
+
+    renderAnswer(answer: string, answerContainer: HTMLElement) {
+        const tempEl = document.createElement('div');
+        tempEl.innerHTML = answer;
+        answerContainer.innerHTML = tempEl.innerHTML;
+
+        const internalLinkRegex = /!\[\[(.*?)\]\]/g;
+        let match;
+        while ((match = internalLinkRegex.exec(answer)) !== null) {
+            const link = match[1];
+            const file = this.app.metadataCache.getFirstLinkpathDest(link, '');
+            if (file) {
+                const imageSource = this.app.vault.getResourcePath(file);
+                const img = document.createElement('img');
+                img.src = imageSource;
+                img.style.maxWidth = '100%';
+                answerContainer.appendChild(img);
+            }
         }
     }
 
