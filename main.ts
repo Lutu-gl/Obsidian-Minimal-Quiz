@@ -1,5 +1,4 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
@@ -10,12 +9,49 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	mySetting: 'default'
 }
 
-export default class MyPlugin extends Plugin {
+export default class MinimalQuizPlugin extends Plugin {
 	settings: MyPluginSettings;
 
 	async onload() {
 		await this.loadSettings();
+			this.addRibbonIcon('dice', 'Greet', () => {
+			new Notice('Hello, world!');
+		});
 
+	this.addCommand({
+		id: 'show-questions-modal',
+		name: 'Start quiz on current file',
+		editorCallback: (editor: Editor, view: MarkdownView) => {
+			const content = editor.getValue();
+        	const matches = [...content.matchAll(/(.*?)(?=\?)/g)];
+			const results = matches.map(match => match[1].trim()).filter(Boolean);
+			if (results.length > 0) {
+				new QuestionsModal(this.app, results).open();
+			} else {
+				new Notice('No questions found.');
+			}
+		} 
+	});
+
+	this.addCommand({
+		id: 'find-text-before-question-marks',
+		name: 'Find text before question marks',
+		editorCallback: (editor: Editor, view: MarkdownView) => {
+			const content = editor.getValue();
+        	const matches = [...content.matchAll(/(.*?)(?=\?)/g)];
+			const results = matches.map(match => match[1].trim()).filter(Boolean);
+
+			if (results.length > 0) {
+				new Notice(`Found: \n${results.join('\n')}`);
+			} else {
+				new Notice('No questions found.');
+			}
+		}
+	})
+
+	}
+
+	async backup(){
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
@@ -79,7 +115,7 @@ export default class MyPlugin extends Plugin {
 	}
 
 	onunload() {
-
+		console.log('Unloading Plugin')
 	}
 
 	async loadSettings() {
@@ -91,14 +127,31 @@ export default class MyPlugin extends Plugin {
 	}
 }
 
-class SampleModal extends Modal {
-	constructor(app: App) {
+class QuestionsModal extends Modal {
+	questions: string[];
+
+	constructor(app: App, questions: string[]) {
 		super(app);
+		this.questions = questions;
 	}
 
 	onOpen() {
-		const {contentEl} = this;
+		const {contentEl, modalEl} = this;
 		contentEl.setText('Woah!');
+
+		modalEl.style.backdropFilter = 'blur(10px)';
+		modalEl.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+		modalEl.style.color = 'white';
+		modalEl.style.padding = '20px';
+		modalEl.style.borderRadius = '8px';
+		
+		contentEl.createEl('h2', { text: 'Questions found:'});
+		
+	    const list = contentEl.createEl('ul');
+   		this.questions.forEach(question => {
+      		const item = list.createEl('li', { text: question });
+      		item.style.marginBottom = '8px';
+    	});
 	}
 
 	onClose() {
@@ -108,9 +161,9 @@ class SampleModal extends Modal {
 }
 
 class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+	plugin: MinimalQuizPlugin;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: MinimalQuizPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
