@@ -1,92 +1,91 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
 interface MyPluginSettings {
-	alignment: 'left' | 'center';
+    alignment: 'left' | 'center';
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
-	alignment: 'center'
-}
+    alignment: 'center',
+};
 
 export default class MinimalQuizPlugin extends Plugin {
-	settings: MyPluginSettings;
+    settings: MyPluginSettings;
 
-	async onload() {
-		await this.loadSettings();
-			this.addRibbonIcon('dice', 'Start Quiz', () => {
-			new Notice('Quiz started!');
-		});
+    async onload() {
+        await this.loadSettings();
 
-		this.addCommand({
-			id: 'show-questions-modal',
-			name: 'Start quiz on current file',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				new Notice('Yup worked');
-				const content = editor.getValue();
-				const qaMap = this.extractQuestionsAndAnswers(content);
-				const entries = Array.from(qaMap.entries());
-				if (entries.length > 0) {
-					new QuestionsModal(this.app, entries, this.settings).open();
-				} else {
-					new Notice('No questions found.');
-				}
-			} 
-		});
-	}
-	extractQuestionsAndAnswers(content: string): Map<string, string> {
-		const qaMap = new Map<string, string>();
-		const regex = /(.*\?)\n([\s\S]*?)(?=\n\n|$)/g;
-		let match;
-	
-		while ((match = regex.exec(content)) !== null) {
-			const question = match[1].trim();
-			const answer = match[2].trim();
-			if (question && answer) {
-				qaMap.set(question, answer);
+        this.addSettingTab(new MinimalQuizSettingTab(this.app, this));
+
+		this.addRibbonIcon('checkbox-glyph', 'Start Quiz', () => {
+			const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+			if (activeView) {
+				const editor = activeView.editor;
+				this.startQuiz(editor);
+			} else {
+				new Notice('No active Markdown editor found.');
 			}
+		});
+
+        this.addCommand({
+            id: 'show-questions-modal',
+            name: 'Start quiz on current file',
+            editorCallback: (editor: Editor, view: MarkdownView) => {
+				this.startQuiz(editor);
+            },
+        });
+    }
+
+	startQuiz(editor: Editor) {
+		const content = editor.getValue();
+		const qaMap = this.extractQuestionsAndAnswers(content);
+		const entries = Array.from(qaMap.entries());
+		if (entries.length > 0) {
+			new QuestionsModal(this.app, entries, this.settings).open();
+		} else {
+			new Notice('No questions found.');
 		}
-	
-		return qaMap;
 	}
 
-	onunload() {
-		console.log('Unloading Plugin')
-	}
+    extractQuestionsAndAnswers(content: string): Map<string, string> {
+        const qaMap = new Map<string, string>();
+        const regex = /(.*\?)\n([\s\S]*?)(?=\n\n|$)/g;
+        let match;
 
+        while ((match = regex.exec(content)) !== null) {
+            const question = match[1].trim();
+            const answer = match[2].trim();
+            if (question && answer) {
+                qaMap.set(question, answer);
+            }
+        }
 
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
+        return qaMap;
+    }
 
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
+    async loadSettings() {
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    }
+
+    async saveSettings() {
+        await this.saveData(this.settings);
+    }
 }
 
 class QuestionsModal extends Modal {
-	entries: [string, string][];
-	answerVisible = false;
-	currentIndex = 0;
-	settings: MyPluginSettings;
+    entries: [string, string][];
+    answerVisible = false;
+    currentIndex = 0;
+    settings: MyPluginSettings;
 
-	constructor(app: App, questions: [string, string][], settings: MyPluginSettings) {
-		super(app);
-		this.entries = questions;
-		this.settings = settings;
-	}
+    constructor(app: App, questions: [string, string][], settings: MyPluginSettings) {
+        super(app);
+        this.entries = questions;
+        this.settings = settings;
+    }
 
-	onOpen() {
-		this.render();
-		window.addEventListener('keydown', this.handleKeyDown);
-	}
-
-	handleKeyDown = (event: KeyboardEvent) => {
-		if (event.key === ' ' || event.key === 'Enter') {
-			this.toggleAnswer();
-			event.preventDefault();
-		}
-	}
-
+    onOpen() {
+        this.render();
+    }
 
     render() {
         const { contentEl } = this;
@@ -113,17 +112,16 @@ class QuestionsModal extends Modal {
             text: this.answerVisible ? answer : '',
         });
         answerEl.style.marginTop = '5px';
-		
-		let button;
-		if (this.currentIndex >= this.entries.length - 1){
-			button = contentEl.createEl('button', {
-	            text: this.answerVisible ? 'Finish Quiz' : 'Show Answer',
-			})
-		} else {
-			button = contentEl.createEl('button', {
-	            text: this.answerVisible ? 'Next Question' : 'Show Answer',
-	        });
-		}
+
+        // Button-Text basierend auf der aktuellen Frage
+        const isLastQuestion = this.currentIndex === this.entries.length - 1;
+        const buttonText = this.answerVisible
+            ? (isLastQuestion ? 'Finish Quiz' : 'Next Question')
+            : 'Show Answer';
+
+        const button = contentEl.createEl('button', {
+            text: buttonText,
+        });
         button.style.marginTop = '20px';
         button.addEventListener('click', () => this.toggleAnswer());
 
@@ -134,19 +132,47 @@ class QuestionsModal extends Modal {
         }
     }
 
-	toggleAnswer() {
-		if (this.answerVisible) {
-			this.currentIndex++;
-			this.answerVisible = false;
-		} else {
-			this.answerVisible = true;
-		}
-		this.render();
-	}
+    toggleAnswer() {
+        if (this.answerVisible) {
+            this.currentIndex++;
+            this.answerVisible = false;
+        } else {
+            this.answerVisible = true;
+        }
+        this.render();
+    }
 
-	onClose() {
-		const { contentEl } = this;
-		contentEl.empty();
-		window.removeEventListener('keydown', this.handleKeyDown);
-	}
+    onClose() {
+        const { contentEl } = this;
+        contentEl.empty();
+    }
+}
+
+class MinimalQuizSettingTab extends PluginSettingTab {
+    plugin: MinimalQuizPlugin;
+
+    constructor(app: App, plugin: MinimalQuizPlugin) {
+        super(app, plugin);
+        this.plugin = plugin;
+    }
+
+    display(): void {
+        const { containerEl } = this;
+
+        containerEl.empty();
+
+        new Setting(containerEl)
+            .setName('Modal Alignment')
+            .setDesc('Choose the alignment of the modal content.')
+            .addDropdown((dropdown) =>
+                dropdown
+                    .addOption('left', 'Left')
+                    .addOption('center', 'Center')
+                    .setValue(this.plugin.settings.alignment)
+                    .onChange(async (value: 'left' | 'center') => {
+                        this.plugin.settings.alignment = value;
+                        await this.plugin.saveSettings();
+                    })
+            );
+    }
 }
