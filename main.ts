@@ -104,9 +104,22 @@ class QuestionsModal extends Modal {
             bgEl.style.backdropFilter = "none";
             bgEl.style.backgroundColor = "";
         }
+        this.registerKeys();
         this.render();
     }
 
+    registerKeys() {
+        this.handleKeyPress = this.handleKeyPress.bind(this); 
+        window.addEventListener("keydown", this.handleKeyPress);
+    }
+
+    handleKeyPress(event: KeyboardEvent) {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            this.toggleAnswer();
+        }
+    }
+    
     render() {
         const { contentEl } = this;
         contentEl.empty();
@@ -173,6 +186,7 @@ class QuestionsModal extends Modal {
         const { contentEl } = this;
         contentEl.empty();
         this.component.unload();
+        window.removeEventListener("keydown", this.handleKeyPress);
     }
 }
 
