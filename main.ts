@@ -2,10 +2,12 @@ import { App, Component, Editor, MarkdownRenderer, MarkdownView, Modal, Notice, 
 
 interface MyPluginSettings {
     alignment: 'left' | 'center';
+    blurBackground: boolean;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
     alignment: 'center',
+    blurBackground: true
 };
 
 export default class MinimalQuizPlugin extends Plugin {
@@ -86,6 +88,22 @@ class QuestionsModal extends Modal {
     }
 
     onOpen() {
+        const { modalEl } = this;
+        // size of the modal
+        //modalEl.style.width = "60vw";
+        //modalEl.style.height = "70vh"; 
+        modalEl.style.maxWidth = "800px";
+        modalEl.style.maxHeight = "600px";
+
+        // blur of the background
+        const bgEl = modalEl.parentElement;
+        if (bgEl && this.settings.blurBackground) {
+            bgEl.style.backdropFilter = "blur(10px)";
+            bgEl.style.backgroundColor = "rgba(0, 0, 0, 0.3)";
+        } else if (bgEl) {
+            bgEl.style.backdropFilter = "none";
+            bgEl.style.backgroundColor = "";
+        }
         this.render();
     }
 
@@ -114,7 +132,6 @@ class QuestionsModal extends Modal {
             this.renderAnswer(answer, answerContainer);
         }
 
-        // Button-Text basierend auf der aktuellen Frage
         const isLastQuestion = this.currentIndex === this.entries.length - 1;
         const buttonText = this.answerVisible
             ? (isLastQuestion ? 'Finish Quiz' : 'Next Question')
@@ -182,6 +199,18 @@ class MinimalQuizSettingTab extends PluginSettingTab {
                     .setValue(this.plugin.settings.alignment)
                     .onChange(async (value: 'left' | 'center') => {
                         this.plugin.settings.alignment = value;
+                        await this.plugin.saveSettings();
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName('Blur Background')
+            .setDesc('Enable or disable background blur when the modal is open.')
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.settings.blurBackground)
+                    .onChange(async (value) => {
+                        this.plugin.settings.blurBackground = value;
                         await this.plugin.saveSettings();
                     })
             );
