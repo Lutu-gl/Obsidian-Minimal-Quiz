@@ -89,11 +89,6 @@ class QuestionsModal extends Modal {
 
     onOpen() {
         const { modalEl } = this;
-        // size of the modal
-        //modalEl.style.width = "60vw";
-        //modalEl.style.height = "70vh"; 
-        modalEl.style.maxWidth = "800px";
-        modalEl.style.maxHeight = "600px";
 
         // blur of the background
         const bgEl = modalEl.parentElement;
