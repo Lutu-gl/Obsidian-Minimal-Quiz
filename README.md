@@ -25,7 +25,7 @@ This project was inspired by [Obsidian Simple Note Quiz](https://github.com/begi
 
 ## Installation
 1. Download and extract the latest release into your Obsidian plugins folder.
-2. Enable **Obsidian-MinimalQuiz** in the Obsidian settings.
+2. Enable **Minimal Quiz** in the Obsidian settings.
 
 ## License
 This project is licensed under the MIT License.
