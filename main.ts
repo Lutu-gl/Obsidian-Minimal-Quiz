@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Component, Editor, MarkdownRenderer, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
 interface MyPluginSettings {
     alignment: 'left' | 'center';
@@ -76,11 +76,13 @@ class QuestionsModal extends Modal {
     answerVisible = false;
     currentIndex = 0;
     settings: MyPluginSettings;
+    component: Component;
 
     constructor(app: App, questions: [string, string][], settings: MyPluginSettings) {
         super(app);
         this.entries = questions;
         this.settings = settings;
+        this.component = new Component();
     }
 
     onOpen() {
@@ -105,9 +107,8 @@ class QuestionsModal extends Modal {
 
         const [question, answer] = this.entries[this.currentIndex];
 
-        const questionEl = contentEl.createEl('h1');
-        questionEl.textContent = question;
-
+        const questionContainer = contentEl.createEl('div');
+        this.renderQuestion(question, questionContainer);
         const answerContainer = contentEl.createEl('div');
         if (this.answerVisible) {
             this.renderAnswer(answer, answerContainer);
@@ -131,25 +132,14 @@ class QuestionsModal extends Modal {
             contentEl.style.textAlign = 'left';
         }
     }
+    renderQuestion(question: string, questionContainer: HTMLElement) {
+        this.component.load();
+        MarkdownRenderer.render(this.app, question, questionContainer, '', this.component);
+    }
 
-    renderAnswer(answer: string, answerContainer: HTMLElement) {
-        const tempEl = document.createElement('div');
-        tempEl.innerHTML = answer;
-        answerContainer.innerHTML = tempEl.innerHTML;
-
-        const internalLinkRegex = /!\[\[(.*?)\]\]/g;
-        let match;
-        while ((match = internalLinkRegex.exec(answer)) !== null) {
-            const link = match[1];
-            const file = this.app.metadataCache.getFirstLinkpathDest(link, '');
-            if (file) {
-                const imageSource = this.app.vault.getResourcePath(file);
-                const img = document.createElement('img');
-                img.src = imageSource;
-                img.style.maxWidth = '100%';
-                answerContainer.appendChild(img);
-            }
-        }
+    renderAnswer(answer: string, answerContainer: HTMLElement){
+        this.component.load();
+        MarkdownRenderer.render(this.app, answer, answerContainer, '', this.component); 
     }
 
     toggleAnswer() {
@@ -165,6 +155,7 @@ class QuestionsModal extends Modal {
     onClose() {
         const { contentEl } = this;
         contentEl.empty();
+        this.component.unload();
     }
 }
 
