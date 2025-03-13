@@ -3,7 +3,7 @@
 	"name": "Minimal Quiz",
 	"version": "1.0.0",
 	"minAppVersion": "1.0.0",
-	"description": "A minimalistic quiz plugin for Obsidian. Questions are defined in Markdown files with simple formatting.",
+	"description": "Start a quick Markdown-based quiz on your current note. Simple, straightforward, and fully integrated into Obsidian — similar to flashcards in Anki or Quizlet!",
 	"author": "Lutu-gl",
 	"authorUrl": "https://github.com/Lutu-gl",
 	"isDesktopOnly": true
