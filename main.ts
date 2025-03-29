@@ -18,13 +18,13 @@ export default class MinimalQuizPlugin extends Plugin {
 
         this.addSettingTab(new MinimalQuizSettingTab(this.app, this));
 
-        this.addRibbonIcon('checkbox-glyph', 'Start Quiz', () => {
+        this.addRibbonIcon('checkbox-glyph', 'Start quiz', () => {
             const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
             if (activeView) {
                 const editor = activeView.editor;
                 this.startQuiz(editor);
             } else {
-                new Notice('No active Markdown editor found.');
+                new Notice('No active markdown editor found.');
             }
         });
 
@@ -120,7 +120,7 @@ class QuestionsModal extends Modal {
         contentEl.empty();
 
         if (this.currentIndex >= this.entries.length) {
-            new Notice('You finished the Quiz - Good Job!');
+            new Notice('You finished the quiz - good job!');
             this.close();
             return;
         }
@@ -142,8 +142,8 @@ class QuestionsModal extends Modal {
 
         const isLastQuestion = this.currentIndex === this.entries.length - 1;
         const buttonText = this.answerVisible
-            ? (isLastQuestion ? 'Finish Quiz' : 'Next Question')
-            : 'Show Answer';
+            ? (isLastQuestion ? 'Finish quiz' : 'Next question')
+            : 'Show answer';
 
         const button = contentEl.createEl('button', {
             text: buttonText,
@@ -201,7 +201,7 @@ class MinimalQuizSettingTab extends PluginSettingTab {
         containerEl.empty();
 
         new Setting(containerEl)
-            .setName('Modal Alignment')
+            .setName('Modal alignment')
             .setDesc('Choose the alignment of the modal content.')
             .addDropdown((dropdown) =>
                 dropdown
@@ -215,7 +215,7 @@ class MinimalQuizSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName('Blur Background')
+            .setName('Blur background')
             .setDesc('Enable or disable background blur when the modal is open.')
             .addToggle((toggle) =>
                 toggle
