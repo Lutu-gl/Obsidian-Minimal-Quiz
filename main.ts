@@ -42,7 +42,9 @@ export default class MinimalQuizPlugin extends Plugin {
         const qaMap = this.extractQuestionsAndAnswers(content);
         const entries = Array.from(qaMap.entries());
         if (entries.length > 0) {
-            new QuestionsModal(this.app, entries, this.settings).open();
+            const filePath = this.app.workspace.getActiveFile()?.path ?? 'unknown';
+
+            new QuestionsModal(this.app, entries, this.settings, filePath).open();
         } else {
             new Notice('No questions found.');
         }
@@ -79,12 +81,14 @@ class QuestionsModal extends Modal {
     currentIndex = 0;
     settings: MinimalQuizSettings;
     component: Component;
+    sourcePath: string;
 
-    constructor(app: App, questions: [string, string][], settings: MinimalQuizSettings) {
+    constructor(app: App, questions: [string, string][], settings: MinimalQuizSettings, sourcePath: string) {
         super(app);
         this.entries = questions;
         this.settings = settings;
         this.component = new Component();
+        this.sourcePath = sourcePath;
     }
 
     onOpen() {
@@ -161,12 +165,12 @@ class QuestionsModal extends Modal {
     }
     renderQuestion(question: string, questionContainer: HTMLElement) {
         this.component.load();
-        MarkdownRenderer.render(this.app, question, questionContainer, '', this.component);
+        MarkdownRenderer.render(this.app, question, questionContainer, this.sourcePath, this.component);
     }
 
     renderAnswer(answer: string, answerContainer: HTMLElement){
         this.component.load();
-        MarkdownRenderer.render(this.app, answer, answerContainer, '', this.component); 
+        MarkdownRenderer.render(this.app, answer, answerContainer, this.sourcePath, this.component); 
     }
 
     toggleAnswer() {
