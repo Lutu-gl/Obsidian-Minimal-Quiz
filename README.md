@@ -22,8 +22,7 @@ Jupiter
 ```
 ## ▶️ Example in Action
 ### In file
-
-![prompts in file](src/prompt-file.png)
+![prompts in file](src/promptFile.png)
 
 ### Press icon or execute command
 ![command](src/command.png)
