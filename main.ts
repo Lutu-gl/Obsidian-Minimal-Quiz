@@ -103,13 +103,14 @@ class QuestionsModal extends Modal {
             bgEl.classList.remove("quiz-blur");
             bgEl.classList.add("quiz-no-blur");            
         }
+
         this.registerKeys();
         this.render();
     }
 
     registerKeys() {
-        this.handleKeyPress = this.handleKeyPress.bind(this); 
-        window.addEventListener("keydown", this.handleKeyPress);
+        this.handleKeyPress = this.handleKeyPress.bind(this);
+        this.component.registerDomEvent(window, "keydown", this.handleKeyPress);
     }
 
     handleKeyPress(event: KeyboardEvent) {
@@ -187,7 +188,6 @@ class QuestionsModal extends Modal {
         const { contentEl } = this;
         contentEl.empty();
         this.component.unload();
-        window.removeEventListener("keydown", this.handleKeyPress);
     }
 }
 
