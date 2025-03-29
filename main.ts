@@ -1,17 +1,17 @@
 import { App, Component, Editor, MarkdownRenderer, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
-interface MyPluginSettings {
+interface MinimalQuizSettings {
     alignment: 'left' | 'center';
     blurBackground: boolean;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: MinimalQuizSettings = {
     alignment: 'center',
     blurBackground: true
 };
 
 export default class MinimalQuizPlugin extends Plugin {
-    settings: MyPluginSettings;
+    settings: MinimalQuizSettings;
 
     async onload() {
         await this.loadSettings();
@@ -77,10 +77,10 @@ class QuestionsModal extends Modal {
     entries: [string, string][];
     answerVisible = false;
     currentIndex = 0;
-    settings: MyPluginSettings;
+    settings: MinimalQuizSettings;
     component: Component;
 
-    constructor(app: App, questions: [string, string][], settings: MyPluginSettings) {
+    constructor(app: App, questions: [string, string][], settings: MinimalQuizSettings) {
         super(app);
         this.entries = questions;
         this.settings = settings;
@@ -93,11 +93,11 @@ class QuestionsModal extends Modal {
         // blur of the background
         const bgEl = modalEl.parentElement;
         if (bgEl && this.settings.blurBackground) {
-            bgEl.style.backdropFilter = "blur(10px)";
-            bgEl.style.backgroundColor = "rgba(0, 0, 0, 0.3)";
+            bgEl.classList.remove("quiz-no-blur");
+            bgEl.classList.add("quiz-blur");            
         } else if (bgEl) {
-            bgEl.style.backdropFilter = "none";
-            bgEl.style.backgroundColor = "";
+            bgEl.classList.remove("quiz-blur");
+            bgEl.classList.add("quiz-no-blur");            
         }
         this.registerKeys();
         this.render();
@@ -129,7 +129,7 @@ class QuestionsModal extends Modal {
         const progressEl = contentEl.createEl('div', {
             text: `Progress: ${progressText}`,
         });
-        progressEl.style.marginBottom = '20px';
+        progressEl.classList.add('quiz-progress');
 
         const [question, answer] = this.entries[this.currentIndex];
 
@@ -148,14 +148,16 @@ class QuestionsModal extends Modal {
         const button = contentEl.createEl('button', {
             text: buttonText,
         });
-        button.style.marginTop = '20px';
+
+        button.classList.add('quiz-button');
+
         button.addEventListener('click', () => this.toggleAnswer());
 
-        if (this.settings.alignment === 'center') {
-            contentEl.style.textAlign = 'center';
-        } else {
-            contentEl.style.textAlign = 'left';
-        }
+        contentEl.classList.remove('quiz-align-left', 'quiz-align-center');
+        contentEl.classList.add(
+            this.settings.alignment === 'center' ? 'quiz-align-center' : 'quiz-align-left'
+        );
+        
     }
     renderQuestion(question: string, questionContainer: HTMLElement) {
         this.component.load();

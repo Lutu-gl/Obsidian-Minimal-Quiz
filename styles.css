@@ -1,8 +1,25 @@
-/*
+.quiz-blur {
+    backdrop-filter: blur(10px);
+    background-color: rgba(0, 0, 0, 0.3);
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.quiz-no-blur {
+    backdrop-filter: none;
+    background-color: transparent;
+}
 
-If your plugin does not need CSS, delete this file.
+.quiz-progress {
+    margin-bottom: 20px;
+}
 
-*/
+.quiz-button {
+    margin-top: 20px;
+}
+
+.quiz-align-left {
+    text-align: left;
+}
+
+.quiz-align-center {
+    text-align: center;
+}
