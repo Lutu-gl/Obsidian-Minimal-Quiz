@@ -1,6 +1,6 @@
-# Obsidian-Minimal-Quiz
+# Minimal Quiz
 
-Obsidian-MinimalQuiz is the simplest quiz plugin for Obsidian. Define questions directly in your Markdown files—no extra setup required. Just write, quiz, and learn!
+Minimal Quiz is the simplest quiz plugin for Obsidian. Define questions directly in your Markdown files—no extra setup required. Just write, quiz, and learn!
 
 ## Features
 - **Minimalistic**: No complex UI, just Markdown-based quizzes.
@@ -34,7 +34,7 @@ Jupiter
 The plugin will automatically detect the questions and present them in quiz format.
 
 ## Shoutout
-This project was inspired by [Obsidian Simple Note Quiz](https://github.com/beginner137/Obsidian-simple-note-quiz). While that plugin offers great functionality, Obsidian-MinimalQuiz aims to provide an even more minimalistic design with improved stability and no bugs.
+This project was inspired by [Simple Note Quiz](https://github.com/beginner137/Obsidian-simple-note-quiz). While that plugin offers great functionality, Minimal Quiz aims to provide an even more minimalistic design with improved stability and no bugs.
 
 ## Installation
 1. Download and extract the latest release into your Obsidian plugins folder.
