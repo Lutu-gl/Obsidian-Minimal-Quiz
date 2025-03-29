@@ -16,7 +16,21 @@ Paris
 
 Who wrote "1984"?
 George Orwell
+
+What is the largest planet in our solar system?
+Jupiter
 ```
+## ▶️ Example in Action
+### In file
+
+![prompts in file](src/prompt-file.png)
+
+### Press icon or execute command
+![command](src/command.png)
+
+### Quiz in action
+![quiz](src/lastQuestionQ.png)
+![quiz](src/lastQuestionA.png)
 
 The plugin will automatically detect the questions and present them in quiz format.
 
