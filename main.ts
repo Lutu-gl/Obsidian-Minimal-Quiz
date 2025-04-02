@@ -104,13 +104,14 @@ class QuestionsModal extends Modal {
             bgEl.classList.add("quiz-no-blur");            
         }
 
-        this.registerKeys();
-        this.render();
-    }
+        this.scope.register([], 'Enter', () => {
+            this.toggleAnswer();
+        });
+        this.scope.register([], ' ', () => {
+            this.toggleAnswer();
+        });
 
-    registerKeys() {
-        this.handleKeyPress = this.handleKeyPress.bind(this);
-        this.component.registerDomEvent(window, "keydown", this.handleKeyPress);
+        this.render();
     }
 
     handleKeyPress(event: KeyboardEvent) {
