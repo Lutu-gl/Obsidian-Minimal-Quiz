@@ -113,13 +113,6 @@ class QuestionsModal extends Modal {
 
         this.render();
     }
-
-    handleKeyPress(event: KeyboardEvent) {
-        if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            this.toggleAnswer();
-        }
-    }
     
     render() {
         const { contentEl } = this;
